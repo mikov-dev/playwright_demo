@@ -17,10 +17,9 @@ public class HomePageTest extends BaseTest {
     }
 
     @Test
-    public void verifyGetStartedButton() {
-        assertTrue(homePage.getStarted.isVisible());
-        assertTrue(homePage.jsLink.isVisible());
-        homePage.getStarted.click();
+    public void verifyTextInput() {
+        homePage.textInput.fill("Hello World");
+        assertTrue(homePage.textInput.inputValue().equals("Hello World"));
     }
 
 }

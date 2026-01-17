@@ -6,13 +6,11 @@ import org.pnm.BasePage;
 
 public class HomePage extends BasePage {
 
-    public Locator getStarted;
-    public Locator jsLink;
+    public Locator textInput;
 
     public HomePage(Page page) {
         super(page);
-        this.getStarted = page.locator("text=Get Started");
-        this.jsLink = page.locator("text=JavaScript");
+        this.textInput = page.locator("#text-input");
     }
 
 }

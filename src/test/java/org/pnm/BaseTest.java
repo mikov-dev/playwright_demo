@@ -31,7 +31,7 @@ public class BaseTest {
     void createContextAndPage() {
         context = browser.newContext();
         page = context.newPage();
-        page.navigate("https://playwright.dev");
+        page.navigate(AppConfig.BASE_URL);
     }
 
     @AfterEach
