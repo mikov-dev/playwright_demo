@@ -1,14 +1,16 @@
 package org.pnm.e2e;
 
+import com.microsoft.playwright.Locator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.pnm.BaseTest;
 import org.pnm.pages.FormElementsPage;
 
+import java.util.List;
+
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FormElementsPageTests extends BaseTest {
 
@@ -60,14 +62,36 @@ public class FormElementsPageTests extends BaseTest {
     @DisplayName("Test Select Element")
     public void testSelectElement() {
 
-        //TODO: fix this
+        String[] options = {"option1", "option2", "option3", "option4"};
 
-       // String[] options = {"option1", "option2", "option3", "option4"};
-       // String[] optionValues = {"Option 1", "Option 2", "Option 3", "Option 4"};
+        for (String option : options) {
+            assertEquals(option, formElementsPage.selectSingle(option));
+        }
+    }
 
-        //for (int i = 0; i < options.length; i++) {
-           // assertEquals(optionValues[i], formElementsPage.selectSingleOption(options[i]));
-        //}
+    @Test
+    @DisplayName("Test Multi Select Element")
+    public void testMultiSelectElement() {
+        String[] items = {"item1", "item2", "item3", "item4", "item5"};
+        formElementsPage.selectMultiple(items);
+
+        List<Locator> allOptions = formElementsPage.getAllOptions();
+        assertEquals(5, allOptions.size());
+
+        assertThat(formElementsPage.multiSelectElement).hasValues(items);
+    }
+
+    @Test
+    @DisplayName("Test Select All Options")
+    public void testSelectAllOptions() {
+        formElementsPage.selectAllOptions();
+
+        List<Locator> allOptions = formElementsPage.getAllOptions();
+        String[] allValues = allOptions.stream()
+                .map(locator -> locator.getAttribute("value"))
+                .toArray(String[]::new);
+
+        assertThat(formElementsPage.multiSelectElement).hasValues(allValues);
     }
 
 }

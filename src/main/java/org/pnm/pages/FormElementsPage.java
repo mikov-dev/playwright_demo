@@ -3,7 +3,12 @@ package org.pnm.pages;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.BoundingBox;
+import com.microsoft.playwright.options.KeyboardModifier;
 import com.microsoft.playwright.options.SelectOption;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class FormElementsPage extends HomePage {
 
@@ -12,8 +17,9 @@ public class FormElementsPage extends HomePage {
     public Locator passwordInput;
     public Locator textAreaInput;
     public Locator rangeSlider;
-    public Locator selectElementOption;
-    public Locator optionOne;
+    public Locator singleSelectElement;
+    public Locator multiSelectElement;
+
 
     public FormElementsPage(Page page) {
         super(page);
@@ -22,8 +28,8 @@ public class FormElementsPage extends HomePage {
         this.passwordInput = page.getByTestId("password-input");
         this.textAreaInput = page.getByTestId("textarea-input");
         this.rangeSlider = page.getByTestId("range-input");
-        this.selectElementOption = page.getByTestId("single-select");
-        this.optionOne = page.locator("option[value='option1']");
+        this.singleSelectElement = page.getByTestId("single-select");
+        this.multiSelectElement = page.getByTestId("multi-select");
     }
 
     public void goToFormElementsPage() {
@@ -60,7 +66,49 @@ public class FormElementsPage extends HomePage {
         page.mouse().up();
     }
 
-    public String selectSingleOption(String option) {
-        return selectElementOption.selectOption(new SelectOption().setValue(option)).get(0);
+    public String selectSingle(String option) {
+        return singleSelectElement.selectOption(new SelectOption().setValue(option)).get(0);
+    }
+
+    private List<Locator> getLocators(List<String> selectors) {
+        List<Locator> locators = new ArrayList<>();
+        for (String selector : selectors) {
+            locators.add(multiSelectElement.locator(String.format("option[value='%s']", selector)));
+        }
+        return locators;
+    }
+
+    public List<Locator> getAllOptions() {
+        List<Locator> locators = new ArrayList<>();
+        Locator options = multiSelectElement.locator("option");
+        for (int i = 0; i < options.count(); i++) {
+            locators.add(options.nth(i));
+        }
+        return locators;
+    }
+
+
+    public void selectMultiple(String[] selector) {
+        selectMultiple(Arrays.asList(selector));
+    }
+
+    public void selectMultiple(List<String> selectors) {
+        KeyboardModifier modifier =
+                System.getProperty("os.name").toLowerCase().contains("mac")
+                        ? KeyboardModifier.META
+                        : KeyboardModifier.CONTROL;
+
+        for (Locator locator : getLocators(selectors)) {
+            locator.click(new Locator.ClickOptions().setModifiers(List.of(modifier)));
+        }
+    }
+
+    public void selectAllOptions() {
+        List<Locator> options = getAllOptions();
+        List<String> values = new ArrayList<>();
+        for (Locator option : options) {
+            values.add(option.getAttribute("value"));
+        }
+        selectMultiple(values);
     }
 }
